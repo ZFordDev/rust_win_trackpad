@@ -1,15 +1,16 @@
 # The egui hookup
 
-This is the small egui 0.37 adapter. The actual diagnostic hookup is the next
-pass, so these pieces haven't had their hardware check yet.
+This is the small egui 0.37 adapter. I've tested it in the standalone diagnostic
+with stock egui, eframe and winit. Scrolling looks good on my test laptop;
+the [findings](findings.md) cover what that test tells me so far.
 
 ```toml
 [target.'cfg(target_os = "windows")'.dependencies]
 rust_win_trackpad = { path = "../rust_win_trackpad", features = ["egui"] }
 ```
 
-The `egui` feature needs Rust 1.95, like egui 0.37 itself. Other egui versions
-aren't supported by this adapter yet. The native core remains independent.
+The crate requires Rust 1.95, like egui 0.37 itself. Other egui versions aren't
+supported by this adapter yet. The native core remains independent of GUI crates.
 
 ## Attach once, on the window thread
 
@@ -27,8 +28,9 @@ let adapter = rust_win_trackpad::egui::Input::default();
 ```
 
 The window timer advances Windows input. The wake only asks the app to consume
-what arrived. Continuous repaint and our earlier adaptive inertia aren't needed.
-Use the window's viewport-specific repaint request for secondary viewports.
+what arrived. Continuous repaint and the earlier adaptive inertia experiment
+aren't needed. Use the window's viewport-specific repaint request for secondary
+viewports.
 
 ## Before egui consumes each RawInput
 
@@ -39,10 +41,18 @@ existing event vector, including ordinary mouse wheels.
 ```rust,ignore
 let native = trackpad.take_events();
 // Log native here if wanted: timestamps, source, phase and physical movement.
+// egui 0.37 puts modifier changes in the event stream.
+let modifiers = raw_input.events.iter().fold(ctx.input(|i| i.modifiers), |held, event| {
+    match event {
+        egui::Event::ModifiersChanged(current) => *current,
+        egui::Event::WindowFocused(false) => egui::Modifiers::NONE,
+        _ => held,
+    }
+});
 let follow_up = adapter.append(
     &native,
     pixels_per_point,
-    raw_input.modifiers,
+    modifiers,
     &mut raw_input.events,
 );
 if follow_up {

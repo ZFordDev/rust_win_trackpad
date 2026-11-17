@@ -2,12 +2,20 @@
 name = "rust_win_trackpad"
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.70"
+# Start with a toolchain we can actually verify, matching the optional adapter.
+rust-version = "1.95"
 authors = ["zforddev"]
 description = "A small, temporary Windows precision-touchpad workaround."
 license = "Apache-2.0"
 readme = "README.md"
+repository = "https://github.com/ZFordDev/rust_win_trackpad"
 publish = false
+
+# Show the actual Windows API and optional adapter on docs.rs.
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-pc-windows-msvc"]
+all-features = true
 
 [features]
 default = []

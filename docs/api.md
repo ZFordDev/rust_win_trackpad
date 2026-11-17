@@ -1,8 +1,8 @@
 # The small API
 
-The public surface is in. The native core has no winit, egui or eframe dependency.
-The optional `egui` feature targets egui 0.37 and requires its Rust 1.95 minimum.
-The core's declared Rust 1.70 minimum still needs a toolchain check.
+The API is deliberately small. The native core has no winit, egui or eframe
+dependency. This first version requires Rust 1.95. The optional `egui` feature
+targets egui 0.37. I haven't tested an older compiler for core-only use yet.
 
 | Entry point | What it does |
 | --- | --- |
@@ -18,7 +18,8 @@ The core's declared Rust 1.70 minimum still needs a toolchain check.
 ## What comes out
 
 `GestureEvent` contains a monotonic observation time, `Source`, `Phase` and
-`Gesture`. The time is when we observed the callback, not a hardware timestamp.
+`Gesture`. The time records when the callback was observed, not a hardware
+timestamp.
 
 - `Gesture::Scroll { delta: [x, y] }`: incremental physical pixels. Positive
   values move content right and down.
@@ -30,8 +31,8 @@ The core's declared Rust 1.70 minimum still needs a toolchain check.
   and momentum share a lifetime. New contact during momentum cancels the old
   gesture; subsequent movement starts another.
 
-Windows supplies momentum. We don't invent a flick curve. Applications own
-scale conversion, scroll bounds and repaint decisions. See the
+Windows supplies momentum. Applications own scale conversion, scroll bounds
+and repaint decisions. See the
 [egui hookup](egui.md) for the optional adapter.
 
 ## Who owns what
@@ -59,7 +60,7 @@ pointer-free notification; `wake` runs later on the window thread. An unwinding
 wake panic disables the backend. A fatal update error closes it too; a rejected
 contact only records an error. Drain after closure to cancel a delivered gesture.
 
-## What's checked, and what's left
+## Checks and testing
 
 The focused checks cover native setup, COM queue draining, hook forwarding,
 wake delivery, idle shutdown, duplicate rejection and both destruction orders.
@@ -72,5 +73,6 @@ cargo check --offline --no-default-features
 cargo test --lib --offline --features egui -- --nocapture
 ```
 
-Two planned stages remain: wire this crate into the diagnostic and visually
-test it, then a short findings and release-prep pass. No publication yet.
+I've tested scrolling in the standalone diagnostic with stock egui, eframe
+and winit, and it looks good on my Dell Latitude 5520. The
+[findings](findings.md) cover that result and what I still need to check.
