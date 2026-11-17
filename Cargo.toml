@@ -1,0 +1,10 @@
+[package]
+name = "rust_win_trackpad"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+authors = ["zforddev"]
+description = "A small, temporary Windows precision-touchpad workaround."
+license = "Apache-2.0"
+readme = "README.md"
+publish = false

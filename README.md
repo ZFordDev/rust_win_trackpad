@@ -2,6 +2,15 @@
 
 A temporary Rust crate to help fix precision touchpad scrolling on Windows.
 
+## Where things stand
+
+Just the crate skeleton for now. It builds, but doesn't capture input yet.
+The tested backend is coming across in small, reviewable pieces.
+
+The [small API plan](docs/api.md) covers attachment, input delivery and cleanup.
+The [crate source](src/lib.rs) is the other entry point. A working quickstart
+will land with the adapter; this crate isn't ready to plug into an app yet.
+
 > [!IMPORTANT]
 > This is hopefully a temporary repository addressing one tiny issue in a very specific place.
 >
