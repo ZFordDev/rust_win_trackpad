@@ -57,21 +57,20 @@ down the exact cause of the original wheel-delivery issue.
   The export records callback and consumption times, not Update calls or GPU
   presentation. I haven't explained the earlier prototypes' delivery pauses yet.
 
-## Before I publish
+## Version 0.1.0
 
-The implementation and local checks are in place. I'm keeping `publish = false`
-while I finish reviewing the first version. The package and API docs build
-successfully, and hosted docs are configured to show the Windows API and
-optional adapter. The build output is in the investigation's step-6 log.
+The implementation and local checks are in place for the first experimental
+release. The package and API docs build successfully, and hosted docs are
+configured to show the Windows API and optional adapter. The build output is
+in the investigation's step-6 log.
 
 I'm starting with Rust 1.95 because that's what I've checked, and it's also
 egui 0.37's minimum. I hadn't verified the earlier 1.70 declaration, and the
 current core dependencies already include crates requiring 1.71. An older
 core-only compiler may be possible, but I haven't checked that yet.
 
-Next is a final review and a decision about the first experimental release.
-I'll keep the one-laptop limitation in the release notes and add results from
-other setups as they come in.
+I'm keeping the one-laptop limitation in the release notes and will add results
+from other setups as they come in.
 
 The app hookup is in [egui.md](egui.md). The workspace diagnostic and capture
 instructions are under `test/trackpad-crate/`; they aren't bundled in this crate.

@@ -9,7 +9,7 @@ description = "A small, temporary Windows precision-touchpad workaround."
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/ZFordDev/rust_win_trackpad"
-publish = false
+publish = ["crates-io"]
 
 # Show the actual Windows API and optional adapter on docs.rs.
 [package.metadata.docs.rs]
