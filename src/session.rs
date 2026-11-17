@@ -131,6 +131,13 @@ impl Session {
         }
     }
 
+    /// Offer a touchpad contact identified by the owning window's message hook.
+    pub(crate) fn contact(&self, pointer_id: u32) -> Result<()> {
+        self.ensure_open()?;
+        // SAFETY: The hook checks the pointer type before offering this ID.
+        unsafe { self.viewport.SetContact(pointer_id) }
+    }
+
     fn ensure_open(&self) -> Result<()> {
         if self.closed.get() {
             Err(Error::from_hresult(RO_E_CLOSED))

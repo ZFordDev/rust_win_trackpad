@@ -1,7 +1,7 @@
 # The small API we're aiming for
 
-This is the plan, not a working public API yet. The private session and
-callback queue are in. The window hook and input pump are the next piece.
+This is the plan, not a working public API yet. The private session, callback
+queue and window attachment are in. Public gesture conversion comes next.
 
 | Entry point | What it does |
 | --- | --- |
@@ -34,9 +34,16 @@ egui adapter will handle its input conversion separately.
 - Only precision-touchpad contacts enter the native path. Ordinary mouse
   wheels keep their existing route; failed setup leaves that route available.
 
-The public lifetime rules get checked as the window attachment lands.
-The private session already rejects calls after close and balances COM
-initialization on its owning thread.
+The window attachment now checks the owner thread and rejects a second hook
+on the same window. Dropping the guard or destroying the window stops input.
+An in-flight callback retains its state through reentrant teardown. Normal
+detachment releases the hook's reference. Failed removal retains the closed
+state for safety, including if removal fails during window destruction.
+
+The nominal 10 ms timer runs during native input, with up to 25 idle updates
+before stopping. Actual delivery can be slower. Native callbacks post a
+pointer-free notification. `wake` runs later on the window thread and should
+just request a frame. An unwinding wake panic disables the backend.
 
 ## Enough diagnostics to see what's happening
 
@@ -46,10 +53,16 @@ The private queue records native status and six-value transforms with a
 monotonic observation time. Draining takes each sample once. It doesn't call
 application code or render from a COM callback.
 
-One hidden-window check covers the session, real COM callback dispatch,
-draining and late callbacks after close. Scrolling gets its visual check in
-the diagnostic once window attachment is in place.
+The latest focused check covers hook forwarding, wake delivery, idle timer
+shutdown, duplicate rejection, reattachment and both destruction orders.
+The earlier session check covers real COM callbacks and one-time draining.
+Scrolling gets its visual check when the public API reaches the diagnostic.
 
 ```text
-cargo test --lib --offline -- --nocapture
+cargo test --lib --offline attachment::tests::hook_pump_and_both_destruction_orders -- --exact --nocapture
 ```
+
+## What's left
+
+Three planned stages: public gesture conversion plus the egui adapter, then
+the diagnostic's visual test, then a short results and release-prep pass.
