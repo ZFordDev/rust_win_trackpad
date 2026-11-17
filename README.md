@@ -4,12 +4,13 @@ A temporary Rust crate to help fix precision touchpad scrolling on Windows.
 
 ## Where things stand
 
-The native session, window hook and timer pump are in. Gesture conversion and
-the small public API come next, along with the optional egui adapter.
+The native session, window hook and timer pump are in. The public gesture API
+and optional egui 0.37 adapter are now in too. No custom flick curve involved.
 
-The [small API plan](docs/api.md) covers attachment, input delivery and cleanup.
-The [crate source](src/lib.rs) is the other entry point. A working quickstart
-will land with the adapter; this crate isn't ready to plug into an app yet.
+The [small API guide](docs/api.md) covers attachment, input delivery and cleanup.
+The [hookup notes](docs/egui.md) show the two places an app needs to call it.
+The diagnostic's visual test comes next, so this crate isn't a verified
+replacement for the working prototype just yet.
 
 > [!IMPORTANT]
 > This is hopefully a temporary repository addressing one tiny issue in a very specific place.

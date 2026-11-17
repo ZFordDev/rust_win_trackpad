@@ -27,7 +27,7 @@ use claim::Claim;
 
 const SUBCLASS_ID: usize = 0x52575450;
 
-/// Private until gesture conversion and the public wrapper land next.
+/// Native ownership behind the public gesture guard.
 pub(crate) struct Attachment {
     state: Rc<State>,
 }
@@ -107,6 +107,10 @@ impl Attachment {
 
     pub(crate) fn is_closed(&self) -> bool {
         self.state.closed.get()
+    }
+
+    pub(crate) fn close(&self) {
+        self.state.close();
     }
 }
 

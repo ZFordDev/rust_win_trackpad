@@ -1,4 +1,4 @@
-//! Capture what Windows tells us. Window hooks and UI conversion come later.
+//! Capture what Windows tells us. Gesture conversion happens after draining.
 
 use std::{
     sync::{

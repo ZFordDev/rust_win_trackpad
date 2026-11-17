@@ -1,20 +1,30 @@
 //! One tiny Windows touchpad workaround, hopefully temporary.
 //!
-//! The native session, callback queue and window pump are in place. The public
-//! gesture API and optional egui adapter come next. Windows owns momentum.
+//! [`GestureEvent`] carries physical-pixel scrolling and relative pinch scales.
+//! On Windows, [`Trackpad`] attaches to one owner-thread HWND. Windows supplies
+//! momentum; this crate does not predict movement or continuously repaint.
 //!
-//! The planned interface and window-lifetime rules live in `docs/api.md`.
+//! Enable the `egui` feature for the egui 0.37 input adapter (requires Rust 1.95).
+//! The core has no GUI dependency. See `docs/api.md` for the window contract.
 
 #![warn(missing_docs)]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-// The public gesture adapter will expose these private pieces next.
+mod event;
+pub use event::{Gesture, GestureEvent, Phase, Source};
+
+#[cfg(feature = "egui")]
+pub mod egui;
+
 #[cfg(target_os = "windows")]
-#[allow(dead_code)]
 mod attachment;
 #[cfg(target_os = "windows")]
-#[allow(dead_code)]
 mod capture;
 #[cfg(target_os = "windows")]
-#[allow(dead_code)]
+mod convert;
+#[cfg(target_os = "windows")]
 mod session;
+#[cfg(target_os = "windows")]
+mod trackpad;
+#[cfg(target_os = "windows")]
+pub use trackpad::Trackpad;
