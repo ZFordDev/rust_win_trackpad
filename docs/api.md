@@ -1,7 +1,7 @@
 # The small API we're aiming for
 
-This is the plan, not a working API yet. The crate currently builds, but
-doesn't capture input. The native code comes across in the next stages.
+This is the plan, not a working public API yet. The private native session
+can open, update and close. Window attachment and input delivery come next.
 
 | Entry point | What it does |
 | --- | --- |
@@ -34,11 +34,17 @@ egui adapter will handle its input conversion separately.
 - Only precision-touchpad contacts enter the native path. Ordinary mouse
   wheels keep their existing route; failed setup leaves that route available.
 
-These are requirements for the implementation, not guarantees made by this
-empty skeleton. The lifetime and failure paths get checked as they land.
+The public lifetime rules get checked as the window attachment lands.
+The private session already rejects calls after close and balances COM
+initialization on its owning thread.
 
 ## Enough diagnostics to see what's happening
 
 Later stages will add opt-in attachment status, native phases and delivery
 timing. The existing investigation captures remain the comparison baseline.
-This stage only has a build check; there is no native runtime to log yet.
+The session now has one hidden-window smoke test. It exercises real Windows
+setup, a manual update and repeatable cleanup; it doesn't test scrolling.
+
+```text
+cargo test --lib --offline -- --nocapture
+```
