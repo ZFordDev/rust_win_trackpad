@@ -5,7 +5,7 @@ use std::{cell::Cell, marker::PhantomData, rc::Rc};
 use windows::{
     core::{Error, Result},
     Win32::{
-        Foundation::{HWND, RECT, RO_E_CLOSED},
+        Foundation::{E_UNEXPECTED, HWND, RECT, RO_E_CLOSED},
         Graphics::DirectManipulation::*,
         System::Com::{
             CoCreateInstance, CoInitializeEx, CoUninitialize, CLSCTX_INPROC_SERVER,
@@ -32,6 +32,7 @@ pub(crate) struct Session {
     viewport: IDirectManipulationViewport,
     window: HWND,
     closed: Cell<bool>,
+    handler_cookie: Cell<Option<u32>>,
     _apartment: Apartment,
 }
 
@@ -58,6 +59,7 @@ impl Session {
                 viewport,
                 window,
                 closed: Cell::new(false),
+                handler_cookie: Cell::new(None),
                 _apartment: apartment,
             };
             // Own the session before configuration, so an error takes the same
@@ -93,7 +95,23 @@ impl Session {
         }
     }
 
-    /// Activate the configured viewport. Input is hooked up separately.
+    /// Keep one callback registration with the session that owns its lifetime.
+    pub(crate) fn set_handler(
+        &self,
+        handler: &IDirectManipulationViewportEventHandler,
+    ) -> Result<()> {
+        self.ensure_open()?;
+        if self.handler_cookie.get().is_some() {
+            return Err(Error::from_hresult(E_UNEXPECTED));
+        }
+        // SAFETY: The session and window are live on this thread. Windows keeps
+        // a COM reference to the handler until we remove this registration.
+        let cookie = unsafe { self.viewport.AddEventHandler(self.window, handler) }?;
+        self.handler_cookie.set(Some(cookie));
+        Ok(())
+    }
+
+    /// Activate the configured viewport after installing its input handler.
     pub(crate) fn enable(&self) -> Result<()> {
         self.ensure_open()?;
         // SAFETY: The constructor's window contract still holds until close.
@@ -129,6 +147,9 @@ impl Session {
         // SAFETY: The caller closes before window destruction. Setting the flag
         // first also makes reentrant or repeated cleanup harmless.
         unsafe {
+            if let Some(cookie) = self.handler_cookie.take() {
+                let _ = self.viewport.RemoveEventHandler(cookie);
+            }
             let _ = self.viewport.Stop();
             let _ = self.viewport.Abandon();
             let _ = self.manager.Deactivate(self.window);

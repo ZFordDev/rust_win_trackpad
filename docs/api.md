@@ -1,7 +1,7 @@
 # The small API we're aiming for
 
-This is the plan, not a working public API yet. The private native session
-can open, update and close. Window attachment and input delivery come next.
+This is the plan, not a working public API yet. The private session and
+callback queue are in. The window hook and input pump are the next piece.
 
 | Entry point | What it does |
 | --- | --- |
@@ -42,8 +42,13 @@ initialization on its owning thread.
 
 Later stages will add opt-in attachment status, native phases and delivery
 timing. The existing investigation captures remain the comparison baseline.
-The session now has one hidden-window smoke test. It exercises real Windows
-setup, a manual update and repeatable cleanup; it doesn't test scrolling.
+The private queue records native status and six-value transforms with a
+monotonic observation time. Draining takes each sample once. It doesn't call
+application code or render from a COM callback.
+
+One hidden-window check covers the session, real COM callback dispatch,
+draining and late callbacks after close. Scrolling gets its visual check in
+the diagnostic once window attachment is in place.
 
 ```text
 cargo test --lib --offline -- --nocapture

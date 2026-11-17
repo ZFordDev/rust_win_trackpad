@@ -11,10 +11,13 @@ publish = false
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.58", default-features = false, features = [
+    "implement",
     "Win32_Foundation",
     "Win32_Graphics_DirectManipulation",
     "Win32_System_Com",
 ] }
+# The COM implementation macro refers to this crate directly.
+windows-core = { version = "0.58", default-features = false }
 
 [target.'cfg(target_os = "windows")'.dev-dependencies]
 windows = { version = "0.58", default-features = false, features = [

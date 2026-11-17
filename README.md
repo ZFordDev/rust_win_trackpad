@@ -4,8 +4,8 @@ A temporary Rust crate to help fix precision touchpad scrolling on Windows.
 
 ## Where things stand
 
-Native session setup and cleanup are in. Window attachment and input delivery
-are next, so it doesn't capture input yet.
+The native session and callback queue are in. They can record Windows status
+and transforms window attachment and delivery to an app are next.
 
 The [small API plan](docs/api.md) covers attachment, input delivery and cleanup.
 The [crate source](src/lib.rs) is the other entry point. A working quickstart
