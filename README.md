@@ -2,10 +2,26 @@
 
 A temporary Rust crate to help fix precision touchpad scrolling on Windows.
 
+## Where things stand
+
+The native session, window hook and timer pump are in, along with the small
+gesture API and optional egui 0.37 adapter. Windows handles the momentum.
+
+The [small API guide](docs/api.md) covers attachment, input delivery and cleanup.
+The [hookup notes](docs/egui.md) show the two places an app needs to call it.
+I've tested the standalone diagnostic with stock egui, eframe and winit, and
+the initial results look promising on my Dell Latitude 5520 with continuous
+repaint OFF. I'm still testing the behaviour, and other devices need testing too.
+
+The short [findings and release notes](docs/findings.md) cover what passed and
+what's still open. This first version requires Rust 1.95.
+
 > [!IMPORTANT]
 > This is hopefully a temporary repository addressing one tiny issue in a very specific place.
 >
-> Pull requests have been opened upstream in both **winit** and **egui**, and hopefully the full fix will eventually be adopted there, making this crate unnecessary.
+> I'm preparing fixes for **winit** and **egui**, but they're still being tested.
+> Once I'm happy with the fix, I'll open the upstream pull requests. Hopefully
+> it can eventually land there and make this crate unnecessary.
 
 ## Why does this exist?
 
@@ -33,7 +49,7 @@ The problem is that upstream changes aren't guaranteed to be accepted.
 
 `winit` makes it clear in its contributing guidelines that larger changes can face considerable scrutiny, which is fair enough. Maintaining a cross-platform windowing library is no small task.
 
-But I also need this issue fixed across several of my own applications, regardless of whether the upstream PR is accepted.
+But I also need this issue fixed across several of my own applications, regardless of whether a future upstream PR is accepted.
 
 **And so here we are.**
 
@@ -53,7 +69,7 @@ I don't intend to turn this into a massive input-handling framework. The goal is
 
 If you encounter a problem, please open an issue.
 
-I'll investigate what I can, and where appropriate, pass findings or potential improvements upstream to `winit`, depending on the direction of the PR.
+I'll investigate what I can, and where appropriate, pass findings or potential improvements upstream to `winit` and `egui` as that work progresses.
 
 No promises that every device will behave perfectly, but I'll do what I can.
 

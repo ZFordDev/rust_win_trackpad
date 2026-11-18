@@ -1,0 +1,40 @@
+[package]
+name = "rust_win_trackpad"
+version = "0.1.0"
+edition = "2021"
+# Start with a toolchain we can actually verify, matching the optional adapter.
+rust-version = "1.95"
+authors = ["zforddev"]
+description = "A small, temporary Windows precision-touchpad workaround."
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/ZFordDev/rust_win_trackpad"
+publish = ["crates-io"]
+
+# Show the actual Windows API and optional adapter on docs.rs.
+[package.metadata.docs.rs]
+default-target = "x86_64-pc-windows-msvc"
+targets = ["x86_64-pc-windows-msvc"]
+all-features = true
+
+[features]
+default = []
+egui = ["dep:egui"]
+
+[dependencies]
+# The native core stays independent of GUI crates. This adapter targets egui 0.37.
+egui = { version = "0.37", default-features = false, optional = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.58", default-features = false, features = [
+    "implement",
+    "Win32_Foundation",
+    "Win32_Graphics_DirectManipulation",
+    "Win32_System_Com",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+# The COM implementation macro refers to this crate directly.
+windows-core = { version = "0.58", default-features = false }
